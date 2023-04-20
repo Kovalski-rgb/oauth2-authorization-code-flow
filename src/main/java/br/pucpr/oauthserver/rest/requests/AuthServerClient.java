@@ -1,5 +1,7 @@
 package br.pucpr.oauthserver.rest.requests;
 
+import br.pucpr.oauthserver.rest.requests.response.ApiResponse;
+import br.pucpr.oauthserver.rest.requests.response.ProfileResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpEntity;
@@ -25,8 +27,41 @@ public class AuthServerClient {
         this.requestConfig = requestConfig;
     }
 
+    @Async CompletableFuture<ProfileResponse> getUserProfile(String accessToken){
+        var api = new RestTemplate();
+        var uri = new DefaultUriBuilderFactory()
+                .builder()
+                .scheme("https")
+                .host("api.twitter.com")
+                .path("/2/users/me")
+                .build();
+
+        var headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
+
+        var request = new HttpEntity<>(headers);
+
+        System.out.println(request.getBody());
+
+        var response = api.exchange(
+            uri,
+            HttpMethod.GET,
+            request,
+            ProfileResponse.class
+        );
+
+        if(response.getStatusCode().is2xxSuccessful()){
+            var body = response.getBody();
+            logger.info("Response: '"+ body+"'");
+            return CompletableFuture.completedFuture(body);
+        }
+        return CompletableFuture.failedFuture(
+                new Exception("Invalid response: %d" + response.getStatusCode().value())
+        );
+    }
+
     @Async
-    public CompletableFuture<String> exchangeAuthCode(String code, String codeChallenge){
+    public CompletableFuture<ApiResponse> exchangeAuthCode(String code, String codeChallenge){
         var api = new RestTemplate();
         var uri = new DefaultUriBuilderFactory()
                 .builder()
@@ -53,7 +88,7 @@ public class AuthServerClient {
         var response = api.postForEntity(
                 uri,
                 request,
-                String.class
+                ApiResponse.class
         );
 
         if(response.getStatusCode().is2xxSuccessful()){
