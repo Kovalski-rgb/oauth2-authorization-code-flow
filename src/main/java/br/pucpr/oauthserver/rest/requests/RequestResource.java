@@ -3,10 +3,7 @@ package br.pucpr.oauthserver.rest.requests;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/requests")
@@ -20,14 +17,15 @@ public class RequestResource {
 
     @PostMapping("/access-token")
     public ResponseEntity<String> getAccessToken(
-            @Valid @NotNull String credentials
+            @Valid @RequestParam String code,
+            @Valid @RequestParam String challenge
     ){
-        return ResponseEntity.ok(service.login(credentials));
+        return ResponseEntity.ok(service.getAccessToken(code, challenge));
     }
 
     @GetMapping("/callback")
     public ResponseEntity<String> callback(){
-        return ResponseEntity.ok("everything OK :]");
+        return ResponseEntity.ok("try using this as callback later");
     }
 
 }

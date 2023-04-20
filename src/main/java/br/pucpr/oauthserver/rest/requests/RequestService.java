@@ -14,8 +14,8 @@ public class RequestService {
         this.authServer = authServer;
     }
 
-    public String login(String credentials){
-        return authServer.login(credentials)
+    public String getAccessToken(String code, String challenge){
+        return authServer.exchangeAuthCode(code, challenge)
                 .exceptionally(error-> {
                     logger.error("Login failed - ", error.getCause());
                     return null;
