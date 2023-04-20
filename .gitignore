@@ -64,4 +64,5 @@ target
 secrets.yml
 .gradletasknamecache
 .sts4-cache
-application.properties
+oauth.properties
+src/main/resources/oauth.properties
